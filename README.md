@@ -96,7 +96,7 @@ Each grid is a 2D list of integers (colors) in the range `0`–`9`.
 2. Run the solver with a chosen time budget and worker count.
 3. Inspect `submission.json.stats.csv` to understand search behavior and
    identify tasks that could benefit from new operators.
-4. Review `missing_ops.jsonl` to prioritize DSL improvements.
+4. Review `missing_ops.json` to prioritize DSL improvements.
 
 ## License
 
