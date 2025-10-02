@@ -153,6 +153,22 @@ def transform_by_object_template(grid: Grid, transform_map: Dict[Template, Dict[
     return draw_objects(height, width, new_objects)
 
 
+def find_shapes(grid: Grid, connectivity: int = 4) -> Grid:
+    """Return a mask grid labelling each discovered object with a unique colour."""
+
+    objects = extract_objects(grid, connectivity)
+    height, width = dims(grid)
+    out = make_grid(height, width)
+    for idx, obj in enumerate(objects, start=1):
+        r0, c0, _, _ = obj["bbox"]
+        gh, gw = dims(obj["grid"])
+        for rr in range(gh):
+            for cc in range(gw):
+                if obj["grid"][rr][cc] != 0:
+                    out[r0 + rr][c0 + cc] = idx
+    return out
+
+
 def translate_object(grid: Grid, dr: int, dc: int) -> Grid:
     """Translate every object by ``(dr, dc)`` ignoring collisions."""
 
@@ -171,6 +187,222 @@ def translate_object(grid: Grid, dr: int, dc: int) -> Grid:
                     nr, nc = r0 + rr + dr, c0 + cc + dc
                     if 0 <= nr < height and 0 <= nc < width:
                         out[nr][nc] = value
+    return out
+
+
+def copy_dominant_object(grid: Grid, to: str = "center") -> Grid:
+    """Copy the largest object to a new location while keeping the original."""
+
+    height, width = dims(grid)
+    objects = extract_objects(grid)
+    if not objects:
+        return deepcopy_grid(grid)
+    dominant = max(objects, key=lambda obj: obj["size"])
+    out = deepcopy_grid(grid)
+    gh, gw = dims(dominant["grid"])
+    if to == "center":
+        base_r = max(0, (height - gh) // 2)
+        base_c = max(0, (width - gw) // 2)
+    elif to == "tl":
+        base_r, base_c = 0, 0
+    elif to == "tr":
+        base_r, base_c = 0, max(0, width - gw)
+    elif to == "bl":
+        base_r, base_c = max(0, height - gh), 0
+    else:
+        base_r, base_c = max(0, height - gh), max(0, width - gw)
+    for rr in range(gh):
+        for cc in range(gw):
+            value = dominant["grid"][rr][cc]
+            if value != 0 and 0 <= base_r + rr < height and 0 <= base_c + cc < width:
+                out[base_r + rr][base_c + cc] = value
+    return out
+
+
+def align_to_edge(grid: Grid, which: str = "top") -> Grid:
+    """Slide objects as a group so their bounding box touches the requested edge."""
+
+    height, width = dims(grid)
+    if height == 0 or width == 0:
+        return []
+    objects = extract_objects(grid)
+    if not objects:
+        return deepcopy_grid(grid)
+    r0 = min(obj["bbox"][0] for obj in objects)
+    c0 = min(obj["bbox"][1] for obj in objects)
+    r1 = max(obj["bbox"][2] for obj in objects)
+    c1 = max(obj["bbox"][3] for obj in objects)
+    delta_r = 0
+    delta_c = 0
+    if which == "top":
+        delta_r = -r0
+    elif which == "bottom":
+        delta_r = height - r1
+    elif which == "left":
+        delta_c = -c0
+    elif which == "right":
+        delta_c = width - c1
+    out = make_grid(height, width)
+    for obj in objects:
+        r0_obj, c0_obj, _, _ = obj["bbox"]
+        gh, gw = dims(obj["grid"])
+        for rr in range(gh):
+            for cc in range(gw):
+                value = obj["grid"][rr][cc]
+                if value == 0:
+                    continue
+                nr, nc = r0_obj + rr + delta_r, c0_obj + cc + delta_c
+                if 0 <= nr < height and 0 <= nc < width:
+                    out[nr][nc] = value
+    return out
+
+
+def colorize_by_size(grid: Grid, order: str = "asc") -> Grid:
+    """Assign colours to objects based on their size ranking."""
+
+    objects = extract_objects(grid)
+    if not objects:
+        return deepcopy_grid(grid)
+    reverse = order == "desc"
+    sorted_objs = sorted(objects, key=lambda obj: obj["size"], reverse=reverse)
+    palette = [i for i in range(1, 10)]
+    out = make_grid(*dims(grid))
+    for colour_idx, obj in enumerate(sorted_objs):
+        colour = palette[colour_idx % len(palette)]
+        r0, c0, _, _ = obj["bbox"]
+        gh, gw = dims(obj["grid"])
+        for rr in range(gh):
+            for cc in range(gw):
+                if obj["grid"][rr][cc] != 0:
+                    out[r0 + rr][c0 + cc] = colour
+    return out
+
+
+def remove_small_objects(grid: Grid, min_size: int = 2) -> Grid:
+    """Remove objects whose pixel count is less than ``min_size``."""
+
+    objects = [obj for obj in extract_objects(grid) if obj["size"] >= max(1, min_size)]
+    return draw_objects(*dims(grid), objects)
+
+
+def keep_objects_with_color(grid: Grid, color: int) -> Grid:
+    """Keep only objects whose dominant colour matches ``color``."""
+
+    objects = [obj for obj in extract_objects(grid) if obj["color"] == color]
+    return draw_objects(*dims(grid), objects)
+
+
+def repeat_objects_horiz(grid: Grid, count: int, gap: int = 0) -> Grid:
+    """Repeat the discovered objects horizontally ``count`` times with ``gap``."""
+
+    height, width = dims(grid)
+    if count <= 1:
+        return deepcopy_grid(grid)
+    objects = extract_objects(grid)
+    if not objects:
+        return deepcopy_grid(grid)
+    out_width = width * count + gap * (count - 1)
+    out = make_grid(height, out_width)
+    for idx in range(count):
+        offset_c = idx * (width + gap)
+        for obj in objects:
+            r0, c0, _, _ = obj["bbox"]
+            gh, gw = dims(obj["grid"])
+            for rr in range(gh):
+                for cc in range(gw):
+                    value = obj["grid"][rr][cc]
+                    if value != 0:
+                        nr, nc = r0 + rr, c0 + cc + offset_c
+                        if 0 <= nr < height and 0 <= nc < out_width:
+                            out[nr][nc] = value
+    return out
+
+
+def distribute_evenly(grid: Grid, axis: str = "h") -> Grid:
+    """Space objects evenly along ``axis`` while preserving relative order."""
+
+    height, width = dims(grid)
+    objects = extract_objects(grid)
+    if len(objects) <= 1:
+        return deepcopy_grid(grid)
+    objects = sorted(objects, key=lambda obj: obj["bbox"][1 if axis == "h" else 0])
+    slots = len(objects) - 1
+    if axis == "h":
+        span = max(0, width - max(dims(obj["grid"])[1] for obj in objects))
+        step = span // max(1, slots)
+        base = 0
+        out = make_grid(height, width)
+        for obj in objects:
+            r0, _, r1, _ = obj["bbox"]
+            gh, gw = dims(obj["grid"])
+            for rr in range(gh):
+                for cc in range(gw):
+                    value = obj["grid"][rr][cc]
+                    if value != 0 and 0 <= r0 + rr < height and 0 <= base + cc < width:
+                        out[r0 + rr][base + cc] = value
+            base += max(step, gw)
+    else:
+        span = max(0, height - max(dims(obj["grid"])[0] for obj in objects))
+        step = span // max(1, slots)
+        base = 0
+        out = make_grid(height, width)
+        for obj in objects:
+            _, c0, _, c1 = obj["bbox"]
+            gh, gw = dims(obj["grid"])
+            for rr in range(gh):
+                for cc in range(gw):
+                    value = obj["grid"][rr][cc]
+                    if value != 0 and 0 <= base + rr < height and 0 <= c0 + cc < width:
+                        out[base + rr][c0 + cc] = value
+            base += max(step, gh)
+    return out
+
+
+def snap_to_grid(grid: Grid, tile_h: int, tile_w: int) -> Grid:
+    """Snap object anchors to a lattice defined by ``tile_h``/``tile_w``."""
+
+    if tile_h <= 0 or tile_w <= 0:
+        return deepcopy_grid(grid)
+    height, width = dims(grid)
+    out = make_grid(height, width)
+    for obj in extract_objects(grid):
+        r0, c0, _, _ = obj["bbox"]
+        gh, gw = dims(obj["grid"])
+        target_r = (r0 // tile_h) * tile_h
+        target_c = (c0 // tile_w) * tile_w
+        for rr in range(gh):
+            for cc in range(gw):
+                value = obj["grid"][rr][cc]
+                if value != 0:
+                    nr, nc = target_r + rr, target_c + cc
+                    if 0 <= nr < height and 0 <= nc < width:
+                        out[nr][nc] = value
+    return out
+
+
+def repeat_objects_vertical(grid: Grid, count: int, gap: int = 0) -> Grid:
+    """Internal helper: repeat objects vertically (used by rule engine)."""
+
+    height, width = dims(grid)
+    if count <= 1:
+        return deepcopy_grid(grid)
+    objects = extract_objects(grid)
+    if not objects:
+        return deepcopy_grid(grid)
+    out_height = height * count + gap * (count - 1)
+    out = make_grid(out_height, width)
+    for idx in range(count):
+        offset_r = idx * (height + gap)
+        for obj in objects:
+            r0, c0, _, _ = obj["bbox"]
+            gh, gw = dims(obj["grid"])
+            for rr in range(gh):
+                for cc in range(gw):
+                    value = obj["grid"][rr][cc]
+                    if value != 0:
+                        nr, nc = r0 + rr + offset_r, c0 + cc
+                        if 0 <= nr < out_height and 0 <= nc < width:
+                            out[nr][nc] = value
     return out
 
 
@@ -295,6 +527,7 @@ __all__ = [
     "draw_objects",
     "learn_object_transformation_maps",
     "transform_by_object_template",
+    "find_shapes",
     "translate_object",
     "place_in_center",
     "place_in_corner",
@@ -302,5 +535,13 @@ __all__ = [
     "keep_largest_object",
     "outline_object",
     "fill_object",
+    "copy_dominant_object",
+    "align_to_edge",
+    "colorize_by_size",
+    "remove_small_objects",
+    "keep_objects_with_color",
+    "repeat_objects_horiz",
+    "distribute_evenly",
+    "snap_to_grid",
     "translate_all_by_centroid",
 ]

@@ -8,8 +8,9 @@ can be reused by unit tests or alternative search strategies.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 from .grid_utils import deepcopy_grid, make_grid
 from .operations import get_operation
@@ -42,10 +43,20 @@ class Program:
                 return make_grid(1, 1, 0)
         return out
 
-    def signature(self) -> Tuple[str, ...]:
-        """Return the tuple of operation names for deduplication."""
+    def signature(self) -> str:
+        """Return a structural fingerprint of the program.
 
-        return tuple(op.name for op in self.ops)
+        The signature is a stable hash constructed from the ordered sequence of
+        operations and their parameters. It is used for structural
+        deduplication both during search and when persisting solved programs in
+        the dynamic library.
+        """
+
+        payload = [
+            (op.name, tuple(sorted(op.params.items())))
+            for op in self.ops
+        ]
+        return hashlib.md5(str(payload).encode()).hexdigest()
 
     def cost(self) -> float:
         """Heuristic cost balancing program length and parameter verbosity."""

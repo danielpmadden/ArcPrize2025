@@ -14,7 +14,7 @@ has a trustworthy reference.
 
 from __future__ import annotations
 
-from collections import deque
+from collections import Counter, deque
 from typing import Dict, Iterable, Tuple
 
 import numpy as np
@@ -177,6 +177,40 @@ def map_color(grid: Grid, color_map: Dict[Color, Color]) -> Grid:
 
 
 @enforce_invariants
+def complete_symmetry(grid: Grid, axis: str = "h") -> Grid:
+    """Fill missing halves by mirroring content across ``axis``.
+
+    The function keeps existing pixels and only copies colours into empty cells.
+    ``axis`` follows the same convention as :func:`flip` (``"h"`` mirrors along
+    the vertical axis, ``"v"`` along the horizontal axis).
+    """
+
+    out = deepcopy_grid(grid)
+    height, width = dims(grid)
+    if axis not in {"h", "v"}:
+        return out
+    if axis == "h":
+        for r in range(height):
+            for c in range(width // 2):
+                mirror = width - 1 - c
+                left, right = out[r][c], out[r][mirror]
+                if left and not right:
+                    out[r][mirror] = left
+                elif right and not left:
+                    out[r][c] = right
+    else:
+        for c in range(width):
+            for r in range(height // 2):
+                mirror = height - 1 - r
+                top, bottom = out[r][c], out[mirror][c]
+                if top and not bottom:
+                    out[mirror][c] = top
+                elif bottom and not top:
+                    out[r][c] = bottom
+    return out
+
+
+@enforce_invariants
 def tile_to_target(grid: Grid, target_h: int, target_w: int) -> Grid:
     """Tile ``grid`` until reaching ``target_h`` x ``target_w`` dimensions."""
 
@@ -206,6 +240,63 @@ def repeat_scale(grid: Grid, factor: int) -> Grid:
             for dr in range(factor):
                 for dc in range(factor):
                     out[row_start + dr][col_start + dc] = value
+    return out
+
+
+@enforce_invariants
+def project_profile(grid: Grid, axis: str = "h") -> Grid:
+    """Collapse a grid along ``axis`` using logical OR style projection.
+
+    The function preserves the grid dimensions by filling entire rows or columns
+    with the dominant non-zero colour encountered along that slice. This is
+    useful for tasks requiring silhouettes or bars to be extrapolated.
+    """
+
+    height, width = dims(grid)
+    out = make_grid(height, width)
+    if axis == "h":
+        for c in range(width):
+            column = [grid[r][c] for r in range(height) if grid[r][c] != 0]
+            if not column:
+                continue
+            colour = Counter(column).most_common(1)[0][0]
+            for r in range(height):
+                out[r][c] = colour
+    else:
+        for r in range(height):
+            row_vals = [grid[r][c] for c in range(width) if grid[r][c] != 0]
+            if not row_vals:
+                continue
+            colour = Counter(row_vals).most_common(1)[0][0]
+            for c in range(width):
+                out[r][c] = colour
+    return out
+
+
+@enforce_invariants
+def flood_fill_from(grid: Grid, color_src: int, color_dst: int) -> Grid:
+    """Flood fill contiguous regions of ``color_src`` with ``color_dst``."""
+
+    if color_src == color_dst:
+        return deepcopy_grid(grid)
+    height, width = dims(grid)
+    out = deepcopy_grid(grid)
+    visited = set()
+    for r in range(height):
+        for c in range(width):
+            if out[r][c] != color_src or (r, c) in visited:
+                continue
+            queue = deque([(r, c)])
+            visited.add((r, c))
+            while queue:
+                pr, pc = queue.popleft()
+                out[pr][pc] = color_dst
+                for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    nr, nc = pr + dr, pc + dc
+                    if 0 <= nr < height and 0 <= nc < width and (nr, nc) not in visited:
+                        if out[nr][nc] == color_src:
+                            visited.add((nr, nc))
+                            queue.append((nr, nc))
     return out
 
 
@@ -356,8 +447,10 @@ __all__ = [
     "crop",
     "overlay",
     "map_color",
+    "complete_symmetry",
     "tile_to_target",
     "repeat_scale",
+    "project_profile",
     "fill_holes",
     "mirror_symmetry",
     "compress_block",
@@ -366,4 +459,5 @@ __all__ = [
     "tile_with_padding",
     "replace_region",
     "grow_block",
+    "flood_fill_from",
 ]
