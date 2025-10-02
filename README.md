@@ -1,6 +1,5 @@
 # ArcPrize2025 – REAP
 
-[![License: Apache-2.0 (proposed)](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB.svg)](https://www.python.org/downloads/release/python-3100/)
 ![Tests](https://img.shields.io/badge/tests-in_progress-orange.svg)
 ![Releases](https://img.shields.io/badge/releases-prototype-lightgrey.svg)
@@ -9,8 +8,6 @@
 **REAP (Recursive Emergent Abstraction Program)** is a prototype solver for the [Abstraction and Reasoning Challenge (ARC)](https://arcchallenge.org/). It composes transformations expressed in a symbolic domain-specific language (DSL), parses object-centric features from grids, and searches over candidate programs using heuristic beam search backed by a lightweight memory database. REAP currently targets research workflows rather than leaderboard submissions: it is optimized for introspection, rapid iteration on DSL design, and reproducibility. It does **not** yet provide a full training pipeline, neural components, or automated DSL learning.
 
 ## Demo
-
-![Animated solution of an ARC task](docs/solve.gif)
 
 Example 3×3 task solved with REAP:
 
