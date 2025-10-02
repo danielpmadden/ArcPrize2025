@@ -1262,7 +1262,7 @@ def log_missing(task_id: str, task: Any):
 # Main Pipeline
 # ----------------------------
 def main():
-    parser = argparse.ArgumentParser("REAP v8.1 Solver")
+    parser = argparse.ArgumentParser("REAP Solver")
     parser.add_argument("--infile", required=True, help="ARC tasks JSON input")
     parser.add_argument("--outfile", default="submission.json", help="Output predictions file")
     parser.add_argument("--time_per_task", type=float, default=20.0, help="Time budget per task (sec)")
@@ -1273,7 +1273,7 @@ def main():
     memory_db = load_memory_db()
     submission = {}
 
-    print("REAP v8.1 starting...")
+    print("REAP starting...")
 
     task_ids = list(raw.keys())
     total_tasks = len(task_ids)
