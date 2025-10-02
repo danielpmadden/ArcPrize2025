@@ -29,6 +29,17 @@ The solver depends only on the Python standard library. It has been tested with
 Python 3.10+, but any modern Python 3 interpreter with `dataclasses` support
 should work.
 
+## Modular structure
+
+The solver internals are now packaged in the `reap` Python module so that they can be reused programmatically:
+
+- `reap.types` exposes the grid dataclasses and type aliases.
+- `reap.encoders` contains text/grid encoder implementations.
+- `reap.grid_utils` bundles fundamental grid manipulation helpers.
+- `reap.__init__` re-exports the most common symbols for convenience.
+
+With this layout you can `import reap` from other scripts, build tests around the primitives, or extend the DSL without modifying the CLI entry point in `REAP.py`.
+
 ## Usage
 
 ```

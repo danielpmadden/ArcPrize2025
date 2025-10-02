@@ -15,73 +15,41 @@ from dataclasses import dataclass
 # ----------------------------
 # In ARC, a Grid is just a 2D list of integers (colors 0–9)
 
-Grid = List[List[int]]
-
-@dataclass
-class Example:
-    input: Grid
-    output: Optional[Grid] = None
-
-# ----------------------------
-# Grid Encoder Utilities
-# ----------------------------
-class GridEncoder:
-    """Base encoder for converting grids to/from text."""
-
-    @staticmethod
-    def to_text(grid: Grid) -> str:
-        raise NotImplementedError
-
-    @staticmethod
-    def to_grid(text: str) -> Grid:
-        raise NotImplementedError
-
-
-class MinimalGridEncoder(GridEncoder):
-    """Encodes grids as plain text digits with no separators."""
-
-    @staticmethod
-    def to_text(grid: Grid) -> str:
-        return "\n".join("".join(str(x) for x in row) for row in grid)
-
-    @staticmethod
-    def to_grid(text: str) -> Grid:
-        return [[int(x) for x in line] for line in text.strip().splitlines()]
-
-
-class GridWithSeparationEncoder(GridEncoder):
-    """Encodes grids with a separator (e.g. '|') between cells."""
-
-    def __init__(self, split_symbol: str = "|"):
-        self.split_symbol = split_symbol
-
-    def to_text(self, grid: Grid) -> str:
-        return "\n".join(self.split_symbol.join(str(x) for x in row) for row in grid)
-
-    def to_grid(self, text: str) -> Grid:
-        return [[int(x) for x in line.split(self.split_symbol)] for line in text.strip().splitlines()]
-
-
-class GridCodeBlockEncoder(GridEncoder):
-    """Wraps another encoder and puts the grid inside a code block."""
-
-    def __init__(self, base_encoder: GridEncoder):
-        self.encoder = base_encoder
-
-    def to_text(self, grid: Grid) -> str:
-        return f"```grid\n{self.encoder.to_text(grid)}\n```"
-
-    def to_grid(self, text: str) -> Grid:
-        grid_text = text.split("```grid\n")[1].split("\n```")[0]
-        return self.encoder.to_grid(grid_text)
+from reap.encoders import (
+    DEFAULT_ENCODER,
+    GridCodeBlockEncoder,
+    GridEncoder,
+    GridWithSeparationEncoder,
+    MinimalGridEncoder,
+)
+from reap.grid_utils import (
+    clamp,
+    crop,
+    deepcopy_grid,
+    dims,
+    enforce_invariants,
+    eq_grid,
+    fill_holes,
+    flip,
+    grid_to_template,
+    make_grid,
+    map_color,
+    mirror_symmetry,
+    overlay,
+    pad,
+    repeat_scale,
+    tile_to_target,
+    valid_grid,
+)
+from reap.types import Color, Coord, Example, Grid, Object, Template, TestItem, TrainPair
 
 
 # Default encoder to use across the system
-DEFAULT_ENCODER = MinimalGridEncoder()
+
 
 def test_encoder(encoder: GridEncoder):
     """Quick sanity check: encode → decode → compare"""
-    sample = [[1,0,0],[0,1,0],[0,0,1]]
+    sample = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
     text = encoder.to_text(sample)
     back = encoder.to_grid(text)
     print("Encoded:\n", text)
@@ -93,224 +61,9 @@ def test_encoder(encoder: GridEncoder):
 # ----------------------------
 # Core Type Aliases & Files
 # ----------------------------
-Color = int
-Coord = Tuple[int, int]
-Object = Dict[str, Any]
-Template = Tuple[Tuple[int, ...], ...]
-TrainPair = Any
-TestItem = Any
-
 # Files for memory & failures
 MEMORY_DB = "memory_db.json"
 FAIL_LOG = "missing_ops.jsonl"
-
-# ----------------------------
-# Utility Grid Functions
-# ----------------------------
-def dims(g: Grid) -> Tuple[int, int]:
-    return (0, 0) if not g or not g[0] else (len(g), len(g[0]))
-
-def deepcopy_grid(g: Grid) -> Grid:
-    return [row[:] for row in g]
-
-def eq_grid(a: Grid, b: Grid) -> bool:
-    return a == b
-
-def valid_grid(g: Grid) -> bool:
-    if not isinstance(g, list) or not g:
-        return True
-    if not all(isinstance(row, list) for row in g):
-        return False
-    if not g[0]:
-        return True
-    w = len(g[0])
-    return all(
-        len(row) == w and all(isinstance(v, int) and 0 <= v <= 9 for v in row)
-        for row in g
-    )
-
-def make_grid(h: int, w: int, fill: int = 0) -> Grid:
-    return [[fill] * w for _ in range(h)]
-
-def clamp(v: int, lo: int, hi: int) -> int:
-    return max(lo, min(v, hi))
-
-def grid_to_template(g: Grid) -> Template:
-    return tuple(tuple(row) for row in g)
-
-# ----------------------------
-# DSL Primitives (rotate, flip, map, etc.)
-# ----------------------------
-
-def enforce_invariants(fn):
-    """Decorator to ensure grids are valid after every op."""
-    def wrapper(*args, **kwargs):
-        out = fn(*args, **kwargs)
-        assert isinstance(out, list), f"{fn.__name__}: Grid must be list"
-        if out:
-            w = len(out[0])
-            for row in out:
-                assert len(row) == w, f"{fn.__name__}: inconsistent row width"
-                for v in row:
-                    assert isinstance(v, int), f"{fn.__name__}: non-int cell"
-                    assert 0 <= v <= 9, f"{fn.__name__}: invalid color {v}"
-        return out
-    return wrapper
-
-
-@enforce_invariants
-def rotate(grid: Grid, angle: int) -> Grid:
-    H, W = dims(grid)
-    angle %= 360
-    if angle == 0: return deepcopy_grid(grid)
-    if angle == 90:
-        out = make_grid(W, H)
-        for r in range(H):
-            for c in range(W):
-                out[c][H-1-r] = grid[r][c]
-        return out
-    if angle == 180:
-        out = make_grid(H, W)
-        for r in range(H):
-            for c in range(W):
-                out[H-1-r][W-1-c] = grid[r][c]
-        return out
-    if angle == 270:
-        out = make_grid(W, H)
-        for r in range(H):
-            for c in range(W):
-                out[W-1-c][r] = grid[r][c]
-        return out
-    return deepcopy_grid(grid)
-
-
-@enforce_invariants
-def flip(grid: Grid, axis: str) -> Grid:
-    H, W = dims(grid)
-    out = make_grid(H, W)
-    if axis == 'h':
-        for r in range(H):
-            for c in range(W):
-                out[r][W-1-c] = grid[r][c]
-    elif axis == 'v':
-        for r in range(H):
-            for c in range(W):
-                out[H-1-r][c] = grid[r][c]
-    else:
-        out = deepcopy_grid(grid)
-    return out
-
-
-@enforce_invariants
-def pad(grid: Grid, top: int, bottom: int, left: int, right: int, value: int = 0) -> Grid:
-    H, W = dims(grid)
-    out = make_grid(H+top+bottom, W+left+right, value)
-    for r in range(H):
-        for c in range(W):
-            out[r+top][c+left] = grid[r][c]
-    return out
-
-
-@enforce_invariants
-def crop(grid: Grid, r0: int, c0: int, r1: int, c1: int) -> Grid:
-    H, W = dims(grid)
-    r0, r1 = clamp(r0, 0, H), clamp(r1, 0, H)
-    c0, c1 = clamp(c0, 0, W), clamp(c1, 0, W)
-    if r1 <= r0 or c1 <= c0: return []
-    return [row[c0:c1] for row in grid[r0:r1]]
-
-
-@enforce_invariants
-def overlay(base: Grid, top: Grid, mode: str = "top_nonzero_over") -> Grid:
-    Hb, Wb = dims(base)
-    Ht, Wt = dims(top)
-    if (Hb, Wb) != (Ht, Wt): return deepcopy_grid(base)
-    out = deepcopy_grid(base)
-    for r in range(Hb):
-        for c in range(Wb):
-            v = top[r][c]
-            if mode == "top_nonzero_over" and v != 0:
-                out[r][c] = v
-    return out
-
-
-@enforce_invariants
-def map_color(grid: Grid, color_map: Dict[Color, Color]) -> Grid:
-    H, W = dims(grid)
-    return [[color_map.get(grid[r][c], grid[r][c]) for c in range(W)] for r in range(H)]
-
-
-@enforce_invariants
-def tile_to_target(grid: Grid, target_h: int, target_w: int) -> Grid:
-    H, W = dims(grid)
-    if H == 0 or W == 0 or target_h <= 0 or target_w <= 0: return []
-    out = make_grid(target_h, target_w)
-    for r in range(target_h):
-        row = grid[r % H]
-        for c in range(target_w):
-            out[r][c] = row[c % W]
-    return out
-
-
-@enforce_invariants
-def repeat_scale(grid: Grid, k: int) -> Grid:
-    if k <= 1: return deepcopy_grid(grid)
-    H, W = dims(grid)
-    out = make_grid(H*k, W*k)
-    for r in range(H):
-        for c in range(W):
-            v = grid[r][c]
-            rs, cs = r*k, c*k
-            for dr in range(k):
-                for dc in range(k):
-                    out[rs+dr][cs+dc] = v
-    return out
-
-
-@enforce_invariants
-def fill_holes(grid: Grid, fill_color: int = 0) -> Grid:
-    H, W = dims(grid)
-    out = deepcopy_grid(grid)
-    visited = [[False]*W for _ in range(H)]
-    dirs = [(1,0),(-1,0),(0,1),(0,-1)]
-    for r in range(H):
-        for c in range(W):
-            if out[r][c] != 0 or visited[r][c]:
-                continue
-            region = []
-            is_border = False
-            q = deque([(r, c)])
-            visited[r][c] = True
-            while q:
-                pr, pc = q.popleft()
-                region.append((pr, pc))
-                if pr in (0, H-1) or pc in (0, W-1):
-                    is_border = True
-                for dr, dc in dirs:
-                    nr, nc = pr+dr, pc+dc
-                    if 0 <= nr < H and 0 <= nc < W and not visited[nr][nc] and out[nr][nc] == 0:
-                        visited[nr][nc] = True
-                        q.append((nr, nc))
-            if not is_border:
-                for pr, pc in region:
-                    out[pr][pc] = fill_color
-    return out
-
-
-@enforce_invariants
-def mirror_symmetry(grid: Grid, axis: str) -> Grid:
-    H, W = dims(grid)
-    out = deepcopy_grid(grid)
-    if axis == 'h':
-        for r in range(H):
-            for c in range(W // 2):
-                out[r][W-1-c] = grid[r][c]
-    elif axis == 'v':
-        for r in range(H // 2):
-            for c in range(W):
-                out[H-1-r][c] = grid[r][c]
-    return out
-
 
 ### NEW DSL OPERATORS ###
 
