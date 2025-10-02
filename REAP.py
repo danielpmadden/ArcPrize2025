@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-REAP v8.1 — ARC-AGI Solver
-Features:
-- Full REAP v8 logic: DSL search, object transforms, BFS beam search, etc.
-- Local Task Memory: Reuse past successful programs (by train IO hash)
-- Failure Logging: Store unsolved tasks for later DSL expansion
-"""
+# ----------------------------
+# REAP - Recusrive Emergent Abstraction Program
+# ----------------------------
 
 import json, time, hashlib, argparse, sys
 import csv, os
