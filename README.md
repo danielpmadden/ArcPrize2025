@@ -1,8 +1,8 @@
-# ArcPrize2025 — REAP v8.1 Solver
+# ArcPrize2025 — REAP Solver
 
-REAP (Recombinatory Enumeration of ARC Programs) is a heuristic search
+REAP (Recursive Emergent Abstraction Program) is a heuristic search
 solver for the [Abstraction and Reasoning Challenge (ARC)](https://arcchallenge.com/).
-This repository packages the "REAP v8.1" solver used in the Arc Prize 2025
+This repository packages the "REAP" solver used in the Arc Prize 2025
 competition. The solver explores a domain-specific language (DSL) of grid
 transformations, performs beam search over candidate programs, and leverages a
 local memory of past solutions to improve performance on related tasks.
