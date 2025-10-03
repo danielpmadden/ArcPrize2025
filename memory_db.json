@@ -1,0 +1,176 @@
+{
+  "solutions": {},
+  "rule_confidence": {
+    "tile_to_target": {
+      "attempts": 1126,
+      "success": 1.0952380952380951,
+      "ema": 3.3648083389810654e-76
+    },
+    "repeat_scale": {
+      "attempts": 13,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "repeat_objects_horiz": {
+      "attempts": 16041,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "distribute_evenly": {
+      "attempts": 5240,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "colorize_by_size": {
+      "attempts": 7163,
+      "success": 1.75,
+      "ema": 4.2808064414395775e-131
+    },
+    "remove_color": {
+      "attempts": 12681,
+      "success": 12.5,
+      "ema": 2.5e-323
+    },
+    "keep_objects_with_color": {
+      "attempts": 9133,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "rotate": {
+      "attempts": 10858,
+      "success": 0.75,
+      "ema": 2.5e-323
+    },
+    "flip": {
+      "attempts": 6305,
+      "success": 10.0,
+      "ema": 2.5e-323
+    },
+    "fill_holes": {
+      "attempts": 3571,
+      "success": 2.4,
+      "ema": 1.9423485462501242e-240
+    },
+    "mirror_symmetry": {
+      "attempts": 6414,
+      "success": 6.5,
+      "ema": 2.5e-323
+    },
+    "keep_largest_object": {
+      "attempts": 2937,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "copy_dominant_object": {
+      "attempts": 12603,
+      "success": 3.5,
+      "ema": 2.5e-323
+    },
+    "snap_to_grid": {
+      "attempts": 29593,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "remove_small_objects": {
+      "attempts": 7261,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "copy_object": {
+      "attempts": 83108,
+      "success": 4.700000000000001,
+      "ema": 2.5e-323
+    },
+    "move_object": {
+      "attempts": 89619,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "grow_shape": {
+      "attempts": 7965,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "shrink_shape": {
+      "attempts": 6415,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "flood_fill_from": {
+      "attempts": 68302,
+      "success": 64.75,
+      "ema": 2.5e-323
+    },
+    "pad": {
+      "attempts": 7156,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "complete_symmetry": {
+      "attempts": 3006,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "project_profile": {
+      "attempts": 4220,
+      "success": 0.2,
+      "ema": 1.7908117603123103e-283
+    },
+    "align_to_edge": {
+      "attempts": 4236,
+      "success": 1.4,
+      "ema": 8.082637010292769e-272
+    },
+    "crop": {
+      "attempts": 6936,
+      "success": 1.5,
+      "ema": 2.5e-323
+    },
+    "map_color": {
+      "attempts": 545,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "translate_all_by_centroid": {
+      "attempts": 1893,
+      "success": 9.0,
+      "ema": 7.820964427446737e-102
+    },
+    "translate_object": {
+      "attempts": 236,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "place_in_center": {
+      "attempts": 10,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "place_in_corner": {
+      "attempts": 38,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "outline_object": {
+      "attempts": 26,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "fill_object": {
+      "attempts": 9,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "transform_by_object_template": {
+      "attempts": 2,
+      "success": 0.0,
+      "ema": 0.0
+    },
+    "replace_region": {
+      "attempts": 17,
+      "success": 0.0,
+      "ema": 0.0
+    }
+  },
+  "task_family_stats": {}
+}

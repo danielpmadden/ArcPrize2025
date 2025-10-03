@@ -1,0 +1,1546 @@
+{
+  "13e47133": {
+    "elapsed": 44.09610342979431,
+    "candidates": 34336,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      175,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "136b0064": {
+    "elapsed": 50.56872844696045,
+    "candidates": 64668,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      142,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "16b78196": {
+    "elapsed": 0.24129748344421387,
+    "candidates": 0,
+    "budget_exhausted": false,
+    "diversity_counts": [],
+    "temperature_trace": []
+  },
+  "135a2760": {
+    "elapsed": 54.70131278038025,
+    "candidates": 56017,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      124,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "16de56c4": {
+    "elapsed": 20.665597915649414,
+    "candidates": 29236,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      164,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "142ca369": {
+    "elapsed": 33.41920614242554,
+    "candidates": 23997,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      148,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "1ae2feb7": {
+    "elapsed": 22.06009578704834,
+    "candidates": 27978,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      157,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "1818057f": {
+    "elapsed": 48.005502462387085,
+    "candidates": 38886,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      93,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "195c6913": {
+    "elapsed": 53.32450604438782,
+    "candidates": 19265,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      130,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "20270e3b": {
+    "elapsed": 54.22412824630737,
+    "candidates": 56943,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      110,
+      320,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "21897d95": {
+    "elapsed": 44.72824287414551,
+    "candidates": 40132,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      190,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "221dfab4": {
+    "elapsed": 38.06675934791565,
+    "candidates": 12891,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      102,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "247ef758": {
+    "elapsed": 32.45195937156677,
+    "candidates": 28328,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      159,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "20a9e565": {
+    "elapsed": 107.11569881439209,
+    "candidates": 33622,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      174,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "28a6681f": {
+    "elapsed": 47.33298134803772,
+    "candidates": 57751,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      133,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "271d71e2": {
+    "elapsed": 57.82781910896301,
+    "candidates": 45153,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      104,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "0934a4d8": {
+    "elapsed": 263.0824730396271,
+    "candidates": 38243,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      181,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "2ba387bc": {
+    "elapsed": 0.3707575798034668,
+    "candidates": 0,
+    "budget_exhausted": false,
+    "diversity_counts": [],
+    "temperature_trace": []
+  },
+  "291dc1e1": {
+    "elapsed": 35.60617470741272,
+    "candidates": 31347,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      163,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "2b83f449": {
+    "elapsed": 39.793986320495605,
+    "candidates": 40602,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      84,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "31f7f899": {
+    "elapsed": 0.10175704956054688,
+    "candidates": 0,
+    "budget_exhausted": false,
+    "diversity_counts": [],
+    "temperature_trace": []
+  },
+  "2c181942": {
+    "elapsed": 56.95833659172058,
+    "candidates": 22210,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      136,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "2d0172a1": {
+    "elapsed": 53.139610052108765,
+    "candidates": 18622,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      123,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "35ab12c3": {
+    "elapsed": 39.46590709686279,
+    "candidates": 24158,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      149,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "36a08778": {
+    "elapsed": 30.167166471481323,
+    "candidates": 11598,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      98,
+      384
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "38007db0": {
+    "elapsed": 23.48500895500183,
+    "candidates": 15281,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      108,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "269e22fb": {
+    "elapsed": 197.61325573921204,
+    "candidates": 56745,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      112,
+      320,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "332f06d7": {
+    "elapsed": 90.40397596359253,
+    "candidates": 49391,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      101,
+      320,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "3dc255db": {
+    "elapsed": 21.16788911819458,
+    "candidates": 17291,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      126,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "409aa875": {
+    "elapsed": 23.017287015914917,
+    "candidates": 11119,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      94,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "45a5af55": {
+    "elapsed": 0.1105489730834961,
+    "candidates": 0,
+    "budget_exhausted": false,
+    "diversity_counts": [],
+    "temperature_trace": []
+  },
+  "3a25b0d8": {
+    "elapsed": 55.892784118652344,
+    "candidates": 31672,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      163,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "4c3d4a41": {
+    "elapsed": 0.0904543399810791,
+    "candidates": 0,
+    "budget_exhausted": false,
+    "diversity_counts": [],
+    "temperature_trace": []
+  },
+  "4a21e3da": {
+    "elapsed": 24.25395107269287,
+    "candidates": 10657,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      90,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "446ef5d2": {
+    "elapsed": 56.834359884262085,
+    "candidates": 56696,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      126,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "3e6067c3": {
+    "elapsed": 88.8989565372467,
+    "candidates": 33166,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      169,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "53fb4810": {
+    "elapsed": 20.40683364868164,
+    "candidates": 14864,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      109,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "4c416de3": {
+    "elapsed": 72.9722490310669,
+    "candidates": 27628,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      155,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "581f7754": {
+    "elapsed": 0.1316056251525879,
+    "candidates": 0,
+    "budget_exhausted": false,
+    "diversity_counts": [],
+    "temperature_trace": []
+  },
+  "4c7dc4dd": {
+    "elapsed": 82.66478991508484,
+    "candidates": 20273,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      124,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "4e34c42c": {
+    "elapsed": 58.992863178253174,
+    "candidates": 31675,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      163,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "5545f144": {
+    "elapsed": 28.54862904548645,
+    "candidates": 22378,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      137,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "58490d8a": {
+    "elapsed": 41.00020718574524,
+    "candidates": 18473,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      122,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "62593bfd": {
+    "elapsed": 0.3292961120605469,
+    "candidates": 0,
+    "budget_exhausted": false,
+    "diversity_counts": [],
+    "temperature_trace": []
+  },
+  "5dbc8537": {
+    "elapsed": 42.44107794761658,
+    "candidates": 39713,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      188,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "5961cc34": {
+    "elapsed": 51.702797412872314,
+    "candidates": 15250,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      111,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "58f5dbd5": {
+    "elapsed": 73.38999438285828,
+    "candidates": 38243,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      181,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "65b59efc": {
+    "elapsed": 34.08309626579285,
+    "candidates": 39293,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      186,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "6e453dd6": {
+    "elapsed": 20.15450882911682,
+    "candidates": 9668,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      86,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "64efde09": {
+    "elapsed": 73.16516304016113,
+    "candidates": 26920,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      151,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "6ffbe589": {
+    "elapsed": 46.00425386428833,
+    "candidates": 28534,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      161,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "6e4f6532": {
+    "elapsed": 56.68697762489319,
+    "candidates": 28315,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      158,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "67e490f4": {
+    "elapsed": 109.52477240562439,
+    "candidates": 38395,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      180,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "71e489b6": {
+    "elapsed": 68.81302428245544,
+    "candidates": 37952,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      94,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "7491f3cf": {
+    "elapsed": 43.24802851676941,
+    "candidates": 33946,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      173,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "7b3084d4": {
+    "elapsed": 0.13700342178344727,
+    "candidates": 0,
+    "budget_exhausted": false,
+    "diversity_counts": [],
+    "temperature_trace": []
+  },
+  "78332cb0": {
+    "elapsed": 21.566529035568237,
+    "candidates": 32111,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      167,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "7666fa5d": {
+    "elapsed": 54.69792127609253,
+    "candidates": 39584,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      81,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "7b5033c1": {
+    "elapsed": 21.01450276374817,
+    "candidates": 21213,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      129,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "7b80bb43": {
+    "elapsed": 26.45108652114868,
+    "candidates": 12280,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      103,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "7b0280bc": {
+    "elapsed": 46.22273135185242,
+    "candidates": 23844,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      147,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "7ed72f31": {
+    "elapsed": 25.2133207321167,
+    "candidates": 18239,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      123,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "800d221b": {
+    "elapsed": 54.469661712646484,
+    "candidates": 34336,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      175,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "80a900e0": {
+    "elapsed": 56.731735944747925,
+    "candidates": 20146,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      116,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "7c66cb00": {
+    "elapsed": 86.34974241256714,
+    "candidates": 22556,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      139,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "8698868d": {
+    "elapsed": 62.84400510787964,
+    "candidates": 31319,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      162,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "88bcf3b4": {
+    "elapsed": 47.669652700424194,
+    "candidates": 35894,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      183,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "88e364bc": {
+    "elapsed": 54.880898237228394,
+    "candidates": 27538,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      159,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "898e7135": {
+    "elapsed": 41.42231798171997,
+    "candidates": 33239,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      172,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "89565ca0": {
+    "elapsed": 64.80331444740295,
+    "candidates": 28182,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      159,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "8b7bacbf": {
+    "elapsed": 43.14019727706909,
+    "candidates": 20159,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      136,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "8b9c3697": {
+    "elapsed": 38.49439215660095,
+    "candidates": 14973,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      109,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "8e5c0c38": {
+    "elapsed": 33.335368156433105,
+    "candidates": 17161,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      126,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "8f3a5a89": {
+    "elapsed": 20.257742643356323,
+    "candidates": 11481,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      97,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "8f215267": {
+    "elapsed": 55.89099168777466,
+    "candidates": 18368,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      123,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "9385bd28": {
+    "elapsed": 44.71036982536316,
+    "candidates": 36483,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      186,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "97d7923e": {
+    "elapsed": 43.69377136230469,
+    "candidates": 50494,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      114,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "9bbf930d": {
+    "elapsed": 49.11325454711914,
+    "candidates": 31600,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      161,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "a25697e4": {
+    "elapsed": 0.2542538642883301,
+    "candidates": 0,
+    "budget_exhausted": false,
+    "diversity_counts": [],
+    "temperature_trace": []
+  },
+  "a251c730": {
+    "elapsed": 103.27336168289185,
+    "candidates": 40133,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      190,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "9aaea919": {
+    "elapsed": 122.08582186698914,
+    "candidates": 26566,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      149,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "a32d8b75": {
+    "elapsed": 104.62321758270264,
+    "candidates": 39923,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      189,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "a395ee82": {
+    "elapsed": 63.89230799674988,
+    "candidates": 21912,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      135,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "a47bf94d": {
+    "elapsed": 79.95430159568787,
+    "candidates": 29921,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      168,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "aa4ec2a5": {
+    "elapsed": 44.988104820251465,
+    "candidates": 9673,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      86,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "abc82100": {
+    "elapsed": 34.70896339416504,
+    "candidates": 20153,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      136,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "b0039139": {
+    "elapsed": 29.19766664505005,
+    "candidates": 27498,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      156,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "981571dc": {
+    "elapsed": 299.5571460723877,
+    "candidates": 35108,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      179,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "a6f40cea": {
+    "elapsed": 114.7806658744812,
+    "candidates": 31319,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      162,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "b6f77b65": {
+    "elapsed": 24.860434532165527,
+    "candidates": 11908,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35,
+      0.35,
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "b10624e5": {
+    "elapsed": 68.0229880809784,
+    "candidates": 19126,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      129,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "bf45cf4b": {
+    "elapsed": 28.25789451599121,
+    "candidates": 25748,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      146,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "b5ca7ac4": {
+    "elapsed": 84.95994734764099,
+    "candidates": 29022,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      162,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "c7f57c3e": {
+    "elapsed": 0.14884471893310547,
+    "candidates": 0,
+    "budget_exhausted": false,
+    "diversity_counts": [],
+    "temperature_trace": []
+  },
+  "b9e38dc0": {
+    "elapsed": 39.44326424598694,
+    "candidates": 29581,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      166,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "cb2d8a2c": {
+    "elapsed": 36.527973890304565,
+    "candidates": 12239,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      96,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "b99e7126": {
+    "elapsed": 98.11095929145813,
+    "candidates": 15001,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      110,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "cbebaa4b": {
+    "elapsed": 37.41630840301514,
+    "candidates": 23984,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      147,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "c4d067a0": {
+    "elapsed": 48.88303780555725,
+    "candidates": 14732,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      108,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "d35bdbdc": {
+    "elapsed": 31.272835969924927,
+    "candidates": 35883,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      182,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "d59b0160": {
+    "elapsed": 58.1546733379364,
+    "candidates": 34512,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      175,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "da515329": {
+    "elapsed": 77.14829564094543,
+    "candidates": 37362,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      92,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "db695cfb": {
+    "elapsed": 31.24059247970581,
+    "candidates": 14050,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      103,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "db0c5428": {
+    "elapsed": 76.38107180595398,
+    "candidates": 33750,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      172,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "dbff022c": {
+    "elapsed": 29.660279989242554,
+    "candidates": 35892,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      183,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "de809cff": {
+    "elapsed": 28.023326873779297,
+    "candidates": 13885,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      110,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "dd6b8c4b": {
+    "elapsed": 67.08337163925171,
+    "candidates": 49711,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      111,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "dfadab01": {
+    "elapsed": 45.33014488220215,
+    "candidates": 24486,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      151,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "d8e07eb2": {
+    "elapsed": 177.81752371788025,
+    "candidates": 28513,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      160,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "e376de54": {
+    "elapsed": 42.23537564277649,
+    "candidates": 22226,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      137,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "e3721c99": {
+    "elapsed": 52.357205390930176,
+    "candidates": 16742,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      122,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "e12f9a14": {
+    "elapsed": 77.83056282997131,
+    "candidates": 27097,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      152,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "e8686506": {
+    "elapsed": 41.48696279525757,
+    "candidates": 71355,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      146,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "eee78d87": {
+    "elapsed": 32.212443113327026,
+    "candidates": 51505,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      108,
+      256,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35,
+      0.35
+    ]
+  },
+  "f560132c": {
+    "elapsed": 38.070136308670044,
+    "candidates": 40343,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      191,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "edb79dae": {
+    "elapsed": 51.49682879447937,
+    "candidates": 30935,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      160,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "f931b4a8": {
+    "elapsed": 27.883775234222412,
+    "candidates": 26798,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      152,
+      320
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "faa9f03d": {
+    "elapsed": 20.267017364501953,
+    "candidates": 20150,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      135,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "e87109e9": {
+    "elapsed": 78.93358874320984,
+    "candidates": 32087,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      166,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  },
+  "fc7cae8d": {
+    "elapsed": 52.24016761779785,
+    "candidates": 32471,
+    "budget_exhausted": true,
+    "diversity_counts": [
+      168,
+      256
+    ],
+    "temperature_trace": [
+      0.35,
+      0.35
+    ]
+  }
+}

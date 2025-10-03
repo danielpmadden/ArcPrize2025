@@ -1,0 +1,6 @@
+cd github\arc\arcprize2025-main
+
+python -m reap --infile arc-agi_training_challenges.json --outfile runs/eval/submission.json --time_per_task 20 --max-workers 4
+
+
+python -m reap --infile arc-agi_evaluation_challenges.json --outfile runs/eval/submission.json --time_per_task 20 --max-workers 4
