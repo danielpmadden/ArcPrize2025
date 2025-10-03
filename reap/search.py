@@ -120,6 +120,9 @@ class SearchStats:
     diversity_counts: List[int] = field(default_factory=list)
     temperature_trace: List[float] = field(default_factory=list)
     budget_exhausted: bool = False
+    best_partial_program: Program | None = None
+    best_partial_outputs: List[Grid] = field(default_factory=list)
+    last_ascii_diff: Optional[str] = None
 
 
 @dataclass
@@ -294,6 +297,12 @@ def enumerate_params_for_op(
                 factors.add(scale_h)
         factors.update({2, 3})
         params = [{"k": factor} for factor in sorted(factors)]
+    elif op_name == "repeat_pattern":
+        factors = {2, 3}
+        if height_in and width_in:
+            limit = min(4, height_in, width_in)
+            factors.update(range(2, max(2, limit) + 1))
+        params = [{"k": factor} for factor in sorted(factors)]
     elif op_name == "pad":
         params = [
             {"top": 1, "bottom": 0, "left": 0, "right": 0, "value": 0},
@@ -322,8 +331,37 @@ def enumerate_params_for_op(
     elif op_name == "remove_color":
         colours = {value for pair in task.train for row in pair.input for value in row}
         params = [{"color": colour} for colour in colours if colour != 0]
-    elif op_name in {"keep_largest_object", "outline_object", "fill_object"}:
+    elif op_name in {"keep_largest_object"}:
         params = [{}]
+    elif op_name in {"outline_object", "fill_object"}:
+        colours = {
+            value
+            for pair in task.train
+            for grid in (pair.input, pair.output)
+            for row in grid
+            for value in row
+            if value != 0
+        }
+        trial = sorted(colours)[:3] or [1]
+        params = [{"color": colour} for colour in trial]
+    elif op_name in {"copy_object", "move_object"}:
+        offsets = [-1, 0, 1]
+        try:
+            objects = extract_objects(first_pair.input) if first_pair else []
+        except Exception:
+            objects = []
+        indices = list(range(min(len(objects), 3))) or [0]
+        params = []
+        for idx in indices:
+            for dr in offsets:
+                for dc in offsets:
+                    if op_name == "move_object" and dr == 0 and dc == 0:
+                        continue
+                    params.append({"obj_id": idx, "dr": dr, "dc": dc})
+        if op_name == "copy_object" and not params:
+            params = [{"obj_id": 0, "dr": 0, "dc": 0}]
+    elif op_name in {"grow_shape", "shrink_shape"}:
+        params = [{"factor": factor} for factor in (2, 3)]
     elif op_name == "keep_objects_with_color":
         colours = {value for pair in task.train for row in pair.input for value in row if value != 0}
         params = [{"color": colour} for colour in colours]
@@ -646,6 +684,7 @@ def bfs_synthesize(task: Any, cfg: SearchConfig) -> Tuple[List[Program], SearchS
     )
     beam: List[Candidate] = [base_candidate]
     valids: List[Candidate] = []
+    best_candidate: Candidate | None = base_candidate
     if base_primary == len(train):
         valids.append(base_candidate)
     stats.best_primary = base_primary
@@ -684,6 +723,7 @@ def bfs_synthesize(task: Any, cfg: SearchConfig) -> Tuple[List[Program], SearchS
             return False
 
         def _register_candidate(program: Program, outputs: List[Grid], primary: int, secondary: float) -> None:
+            nonlocal best_candidate
             struct_sig = program_struct_signature(program)
             behavior_sig = _behaviour_blob(outputs)
             last_op = program.ops[-1].name if program.ops else None
@@ -720,6 +760,8 @@ def bfs_synthesize(task: Any, cfg: SearchConfig) -> Tuple[List[Program], SearchS
             _update_rule_confidence(cfg, program, primary / max(1, len(train)))
             if primary == len(train):
                 valids.append(candidate)
+            if best_candidate is None or candidate_sort_key(candidate) > candidate_sort_key(best_candidate):
+                best_candidate = candidate
 
         for entry in beam:
             parent_program = entry.program
@@ -754,6 +796,18 @@ def bfs_synthesize(task: Any, cfg: SearchConfig) -> Tuple[List[Program], SearchS
             next_candidates = list(behaviour_cache.values())
         else:
             next_candidates = list(candidate_pool)
+        if cfg.deduplicate_equivalence and next_candidates:
+            seen_outputs: Dict[Tuple[Tuple[Tuple[int, ...], ...], ...], bool] = {}
+            unique_candidates: List[Candidate] = []
+            for candidate in next_candidates:
+                signature = tuple(
+                    tuple(tuple(row) for row in grid) for grid in candidate.outputs
+                ) if candidate.outputs else tuple()
+                if signature in seen_outputs:
+                    continue
+                seen_outputs[signature] = True
+                unique_candidates.append(candidate)
+            next_candidates = unique_candidates
         if not next_candidates:
             break
 
@@ -880,6 +934,9 @@ def bfs_synthesize(task: Any, cfg: SearchConfig) -> Tuple[List[Program], SearchS
     if stats.time_elapsed >= cfg.time_budget_s:
         stats.budget_exhausted = True
     stats.valids_found = sum(1 for cand in valids if cand.primary == len(train))
+    if best_candidate is not None:
+        stats.best_partial_program = best_candidate.program
+        stats.best_partial_outputs = best_candidate.outputs
     unique = {cand.struct_sig: cand for cand in sorted(valids, key=candidate_sort_key, reverse=True)}
     return [cand.program for cand in unique.values()], stats
 

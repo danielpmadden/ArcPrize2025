@@ -8,20 +8,192 @@ CLI.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Iterable, List, Tuple
 
-from .dsl import flip, rotate
+from .dsl import (
+    copy_object,
+    fill_object,
+    flip,
+    grow_shape,
+    move_object,
+    outline_object,
+    repeat_pattern,
+    rotate,
+    shrink_shape,
+)
 from .grid_utils import dims, eq_grid
 from .objects import extract_objects
 from .program import Op, Program
 from .rule_engine import compile_rules, prioritise_rules, suggest_rules
-from .search import SearchConfig, SearchStats, bfs_synthesize, pick_two
+from .search import (
+    SearchConfig,
+    SearchStats,
+    bfs_synthesize,
+    diff_grid,
+    evaluate_program,
+    pick_two,
+    program_struct_signature,
+)
 from .task_classifier import TaskProfile, classify_task as classify_task_profile
 from .types import Grid
 from .operations import FUNCTION_REGISTRY
 
 
 MACRO_REGISTRY: Dict[str, Dict[str, Any]] = {}
+
+
+FUNCTION_REGISTRY.update(
+    {
+        "copy_object": copy_object,
+        "move_object": move_object,
+        "repeat_pattern": repeat_pattern,
+        "grow_shape": grow_shape,
+        "shrink_shape": shrink_shape,
+        "outline_object": outline_object,
+        "fill_object": fill_object,
+    }
+)
+
+
+def _has_repetition(grid: Grid) -> bool:
+    height, width = dims(grid)
+    if height <= 1 and width <= 1:
+        return False
+    for block_h in range(1, height + 1):
+        if block_h == height or height % block_h != 0:
+            continue
+        for block_w in range(1, width + 1):
+            if block_w == width or width % block_w != 0:
+                continue
+            block = [row[:block_w] for row in grid[:block_h]]
+            match = True
+            for r in range(height):
+                for c in range(width):
+                    if grid[r][c] != block[r % block_h][c % block_w]:
+                        match = False
+                        break
+                if not match:
+                    break
+            if match:
+                return True
+    return False
+
+
+def _detect_repetition(pairs: List[Any]) -> bool:
+    for pair in pairs:
+        if _has_repetition(pair.input) or _has_repetition(pair.output):
+            return True
+    return False
+
+
+def _centroid(pixels: Iterable[Tuple[int, int]]) -> Tuple[float, float]:
+    pixels = list(pixels)
+    if not pixels:
+        return (0.0, 0.0)
+    count = len(pixels)
+    return (
+        sum(r for r, _ in pixels) / count,
+        sum(c for _, c in pixels) / count,
+    )
+
+
+def _detect_object_movement(pairs: List[Any]) -> bool:
+    moved = False
+    for pair in pairs:
+        try:
+            in_objects = extract_objects(pair.input)
+            out_objects = extract_objects(pair.output)
+        except Exception:
+            continue
+        if not in_objects or len(in_objects) != len(out_objects):
+            continue
+        used: set[int] = set()
+        pair_moved = False
+        for obj in in_objects:
+            candidates = [
+                (idx, cand)
+                for idx, cand in enumerate(out_objects)
+                if idx not in used and cand["color"] == obj["color"] and cand["size"] == obj["size"]
+            ]
+            if len(candidates) != 1:
+                pair_moved = False
+                break
+            idx, target = candidates[0]
+            used.add(idx)
+            cin = _centroid(obj["pixels"])
+            cout = _centroid(target["pixels"])
+            if abs(cin[0] - cout[0]) > 1e-6 or abs(cin[1] - cout[1]) > 1e-6:
+                pair_moved = True
+        if pair_moved:
+            moved = True
+            break
+    return moved
+
+
+def _detect_scaling(pairs: List[Any]) -> bool:
+    for pair in pairs:
+        in_h, in_w = dims(pair.input)
+        out_h, out_w = dims(pair.output)
+        if in_h == 0 or in_w == 0 or out_h == 0 or out_w == 0:
+            continue
+        if in_h == out_h and in_w == out_w:
+            continue
+        if out_h % in_h == 0 and out_w % in_w == 0:
+            if out_h // in_h == out_w // in_w:
+                return True
+        if in_h % out_h == 0 and in_w % out_w == 0:
+            if in_h // out_h == in_w // out_w:
+                return True
+    return False
+
+
+def _perturb_last_operation(program: Program, diff: Dict[str, Any]) -> List[Program]:
+    if not program.ops:
+        return []
+    prefix = program.ops[:-1]
+    tail = program.ops[-1]
+    variants: List[Program] = []
+    numeric_deltas = (-1, 1)
+    mismatch_pred = diff.get("mismatch_pred", {})
+    mismatch_target = diff.get("mismatch_target", {})
+    for key, value in tail.params.items():
+        if isinstance(value, int):
+            for delta in numeric_deltas:
+                candidate_params = dict(tail.params)
+                candidate_params[key] = value + delta
+                variants.append(Program(prefix + [Op(tail.name, candidate_params)]))
+        elif isinstance(value, (tuple, list)):
+            for idx, entry in enumerate(value):
+                if not isinstance(entry, int):
+                    continue
+                for delta in numeric_deltas:
+                    updated = list(value)
+                    updated[idx] = entry + delta
+                    candidate_params = dict(tail.params)
+                    candidate_params[key] = type(value)(updated)
+                    variants.append(Program(prefix + [Op(tail.name, candidate_params)]))
+        elif isinstance(value, dict):
+            if mismatch_pred and mismatch_target:
+                src = max(mismatch_pred, key=mismatch_pred.get)
+                dst = max(mismatch_target, key=mismatch_target.get)
+                if src != dst:
+                    new_map = dict(value)
+                    new_map[src] = dst
+                    candidate_params = dict(tail.params)
+                    candidate_params[key] = new_map
+                    variants.append(Program(prefix + [Op(tail.name, candidate_params)]))
+    if tail.name == "map_color" and mismatch_pred and mismatch_target:
+        candidate_params = dict(tail.params)
+        colour_map = dict(candidate_params.get("color_map", {}))
+        src = max(mismatch_pred, key=mismatch_pred.get)
+        dst = max(mismatch_target, key=mismatch_target.get)
+        colour_map[src] = dst
+        candidate_params["color_map"] = colour_map
+        variants.append(Program(prefix + [Op("map_color", candidate_params)]))
+    unique: Dict[str, Program] = {}
+    for variant in variants:
+        unique[program_struct_signature(variant)] = variant
+    return list(unique.values())[:8]
 
 
 def _normalise_params(value: Any) -> Any:
@@ -110,10 +282,32 @@ def classify_task(task: Any) -> Dict[str, Any]:
     """Compute coarse heuristics and family biases for ``task``."""
 
     base = _base_task_features(task)
-    profile: TaskProfile = classify_task_profile(getattr(task, "train", []))
+    train_pairs = list(getattr(task, "train", []))
+    symmetry = any(
+        eq_grid(pair.output, flip(pair.input, axis))
+        for pair in train_pairs
+        for axis in ("h", "v")
+    ) if train_pairs else False
+    repetition = _detect_repetition(train_pairs)
+    movement = _detect_object_movement(train_pairs)
+    scaling = _detect_scaling(train_pairs)
+    profile: TaskProfile = classify_task_profile(train_pairs)
     base.update(profile.feature_flags)
-    base["family_prioritised_ops"] = profile.prioritised_ops
-    base["families"] = profile.families
+    base["symmetry"] = symmetry
+    base["repetition"] = repetition
+    base["object_movement"] = movement
+    base["scaling"] = scaling
+    families = list(profile.families)
+    if symmetry and "symmetry" not in families:
+        families.append("symmetry")
+    if repetition and "repetition" not in families:
+        families.append("repetition")
+    if movement and "object_movement" not in families:
+        families.append("object_movement")
+    if scaling and "scaling" not in families:
+        families.append("scaling")
+    base["family_prioritised_ops"] = list(profile.prioritised_ops)
+    base["families"] = list(dict.fromkeys(families))
     return base
 
 
@@ -181,6 +375,10 @@ def solve_task(
         "snap_to_grid",
         "remove_small_objects",
         "keep_objects_with_color",
+        "copy_object",
+        "move_object",
+        "grow_shape",
+        "shrink_shape",
         "flood_fill_from",
     ]
     if features.get("obj_count_same"):
@@ -305,6 +503,40 @@ def solve_task(
         programs, stats = [], SearchStats()
 
     unregister_macros(rule_macros)
+
+    if (
+        search_cfg.enable_revisions
+        and stats.valids_found == 0
+        and stats.best_partial_program is not None
+        and getattr(task, "train", [])
+    ):
+        first_pair = task.train[0]
+        predicted = (
+            stats.best_partial_outputs[0]
+            if stats.best_partial_outputs
+            else stats.best_partial_program.apply(first_pair.input)
+        )
+        diff = diff_grid(predicted, first_pair.output)
+        stats.last_ascii_diff = diff.get("ascii")
+        variants = _perturb_last_operation(stats.best_partial_program, diff)
+        if variants:
+            stats.revision_rounds += 1
+        existing_structs = {program_struct_signature(prog) for prog in programs}
+        for variant in variants:
+            stats.revisions_generated += 1
+            try:
+                outputs, primary, secondary = evaluate_program(variant, task.train)
+            except Exception:
+                continue
+            if primary == len(task.train):
+                signature = program_struct_signature(variant)
+                if signature not in existing_structs:
+                    programs.append(variant)
+                    existing_structs.add(signature)
+                stats.valids_found += 1
+                stats.best_primary = max(stats.best_primary, primary)
+                stats.best_secondary = max(stats.best_secondary, secondary)
+                break
 
     program_a, program_b = pick_two(programs)
     if not program_a:

@@ -15,7 +15,7 @@ has a trustworthy reference.
 from __future__ import annotations
 
 from collections import Counter, deque
-from typing import Dict, Iterable, Tuple
+from typing import Dict, Iterable, List, Tuple
 
 import numpy as np
 
@@ -180,7 +180,9 @@ def map_color(grid: Grid, color_map: Dict[Color, Color]) -> Grid:
 def complete_symmetry(grid: Grid, axis: str = "h") -> Grid:
     """Fill missing halves by mirroring content across ``axis``.
 
-    The function keeps existing pixels and only copies colours into empty cells.
+    The implementation prefers to complete the opposite side rather than
+    overwrite existing strokes. Any zero-valued pixel is replaced with the
+    mirrored colour while keeping painted cells untouched.
     ``axis`` follows the same convention as :func:`flip` (``"h"`` mirrors along
     the vertical axis, ``"v"`` along the horizontal axis).
     """
@@ -191,22 +193,26 @@ def complete_symmetry(grid: Grid, axis: str = "h") -> Grid:
         return out
     if axis == "h":
         for r in range(height):
-            for c in range(width // 2):
+            for c in range(width // 2 + width % 2):
                 mirror = width - 1 - c
+                if mirror == c:
+                    continue
                 left, right = out[r][c], out[r][mirror]
-                if left and not right:
-                    out[r][mirror] = left
-                elif right and not left:
+                if left == 0 and right != 0:
                     out[r][c] = right
+                elif right == 0 and left != 0:
+                    out[r][mirror] = left
     else:
         for c in range(width):
-            for r in range(height // 2):
+            for r in range(height // 2 + height % 2):
                 mirror = height - 1 - r
+                if mirror == r:
+                    continue
                 top, bottom = out[r][c], out[mirror][c]
-                if top and not bottom:
-                    out[mirror][c] = top
-                elif bottom and not top:
+                if top == 0 and bottom != 0:
                     out[r][c] = bottom
+                elif bottom == 0 and top != 0:
+                    out[mirror][c] = top
     return out
 
 
@@ -381,20 +387,170 @@ def expand_block(grid: Grid, factor: int) -> Grid:
     return out.tolist()
 
 
-@enforce_invariants
-def repeat_pattern(grid: Grid, stride: int) -> Grid:
-    """Repeat non-zero cells horizontally with a fixed stride."""
+def _tiles_from_block(grid: Grid, block: Grid) -> bool:
+    block_h = len(block)
+    block_w = len(block[0]) if block else 0
+    height, width = dims(grid)
+    if block_h == 0 or block_w == 0:
+        return False
+    for r in range(height):
+        for c in range(width):
+            if grid[r][c] != block[r % block_h][c % block_w]:
+                return False
+    return True
 
-    arr = np.array(grid)
-    height, width = arr.shape if arr.size else (0, 0)
-    out = arr.copy()
-    for i in range(height):
-        for j in range(width):
-            if arr[i, j] != 0:
-                for k in range(1, stride):
-                    if j + k < width:
-                        out[i, j + k] = arr[i, j]
-    return out.tolist()
+
+@enforce_invariants
+def repeat_pattern(grid: Grid, k: int = 2) -> Grid:
+    """Tile the smallest repeating block (up to ``k`` factors) across ``grid``."""
+
+    height, width = dims(grid)
+    if height == 0 or width == 0:
+        return []
+    limit = max(2, k)
+    best_block = deepcopy_grid(grid)
+    best_area = height * width
+    for h_factor in range(1, min(limit, height) + 1):
+        if height % h_factor != 0:
+            continue
+        block_h = height // h_factor
+        for w_factor in range(1, min(limit, width) + 1):
+            if width % w_factor != 0:
+                continue
+            block_w = width // w_factor
+            if block_h * block_w >= best_area:
+                continue
+            candidate = [row[:block_w] for row in grid[:block_h]]
+            if _tiles_from_block(grid, candidate):
+                best_block = candidate
+                best_area = block_h * block_w
+    return tile_to_target(best_block, height, width)
+
+
+@enforce_invariants
+def copy_object(grid: Grid, obj_id: int = 0, dr: int = 0, dc: int = 0) -> Grid:
+    """Duplicate object ``obj_id`` and paste it offset by ``(dr, dc)``."""
+
+    from .objects import extract_objects
+
+    height, width = dims(grid)
+    objects = extract_objects(grid)
+    if not objects:
+        return deepcopy_grid(grid)
+    index = max(0, min(obj_id, len(objects) - 1))
+    target = objects[index]
+    out = deepcopy_grid(grid)
+    r0, c0, _, _ = target["bbox"]
+    obj_grid = target["grid"]
+    gh, gw = dims(obj_grid)
+    for rr in range(gh):
+        for cc in range(gw):
+            value = obj_grid[rr][cc]
+            if value == 0:
+                continue
+            nr, nc = r0 + rr + dr, c0 + cc + dc
+            if 0 <= nr < height and 0 <= nc < width:
+                out[nr][nc] = value
+    return out
+
+
+@enforce_invariants
+def move_object(grid: Grid, obj_id: int = 0, dr: int = 0, dc: int = 0) -> Grid:
+    """Translate object ``obj_id`` by ``(dr, dc)`` while leaving others untouched."""
+
+    from .objects import extract_objects
+
+    height, width = dims(grid)
+    objects = extract_objects(grid)
+    if not objects:
+        return deepcopy_grid(grid)
+    index = max(0, min(obj_id, len(objects) - 1))
+    target = objects[index]
+    out = deepcopy_grid(grid)
+    for r, c in target.get("pixels", set()):
+        if 0 <= r < height and 0 <= c < width:
+            out[r][c] = 0
+    r0, c0, _, _ = target["bbox"]
+    obj_grid = target["grid"]
+    gh, gw = dims(obj_grid)
+    for rr in range(gh):
+        for cc in range(gw):
+            value = obj_grid[rr][cc]
+            if value == 0:
+                continue
+            nr, nc = r0 + rr + dr, c0 + cc + dc
+            if 0 <= nr < height and 0 <= nc < width:
+                out[nr][nc] = value
+    return out
+
+
+@enforce_invariants
+def grow_shape(grid: Grid, factor: int) -> Grid:
+    """Scale shapes up by ``factor`` using nearest-neighbour replication."""
+
+    if factor <= 1:
+        return deepcopy_grid(grid)
+    return repeat_scale(grid, factor)
+
+
+@enforce_invariants
+def shrink_shape(grid: Grid, factor: int) -> Grid:
+    """Shrink shapes by ``factor`` using block compression."""
+
+    if factor <= 1:
+        return deepcopy_grid(grid)
+    return compress_block(grid, factor)
+
+
+@enforce_invariants
+def outline_object(grid: Grid, color: int) -> Grid:
+    """Outline each object with ``color`` using a four-neighbourhood."""
+
+    from .objects import extract_objects
+
+    height, width = dims(grid)
+    out = make_grid(height, width)
+    objects = extract_objects(grid)
+    for obj in objects:
+        r0, c0, _, _ = obj["bbox"]
+        obj_grid = obj["grid"]
+        gh, gw = dims(obj_grid)
+        for rr in range(gh):
+            for cc in range(gw):
+                if obj_grid[rr][cc] == 0:
+                    continue
+                border = False
+                for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    nr, nc = rr + dr, cc + dc
+                    if nr < 0 or nr >= gh or nc < 0 or nc >= gw or obj_grid[nr][nc] == 0:
+                        border = True
+                        break
+                if border:
+                    orow, ocol = r0 + rr, c0 + cc
+                    if 0 <= orow < height and 0 <= ocol < width:
+                        out[orow][ocol] = color
+    return out
+
+
+@enforce_invariants
+def fill_object(grid: Grid, color: int) -> Grid:
+    """Fill each object with ``color``."""
+
+    from .objects import extract_objects
+
+    height, width = dims(grid)
+    out = make_grid(height, width)
+    for obj in extract_objects(grid):
+        r0, c0, _, _ = obj["bbox"]
+        obj_grid = obj["grid"]
+        gh, gw = dims(obj_grid)
+        for rr in range(gh):
+            for cc in range(gw):
+                if obj_grid[rr][cc] != 0:
+                    orow, ocol = r0 + rr, c0 + cc
+                    if 0 <= orow < height and 0 <= ocol < width:
+                        out[orow][ocol] = color
+    return out
 
 
 @enforce_invariants
@@ -456,6 +612,12 @@ __all__ = [
     "compress_block",
     "expand_block",
     "repeat_pattern",
+    "copy_object",
+    "move_object",
+    "grow_shape",
+    "shrink_shape",
+    "outline_object",
+    "fill_object",
     "tile_with_padding",
     "replace_region",
     "grow_block",
