@@ -23,7 +23,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Sequence, Tuple
 
-from .program import Op, Program
+from .program import Op, Program, make_hashable, sanitize_params
 from .types import Example
 
 
@@ -47,7 +47,7 @@ def _program_to_ops(program: Program) -> List[Dict[str, Any]]:
 
     ops: List[Dict[str, Any]] = []
     for op in program.ops:
-        ops.append({"name": op.name, "params": dict(op.params)})
+        ops.append({"name": op.name, "params": sanitize_params(op.params)})
     return ops
 
 
@@ -351,7 +351,7 @@ class LibraryManager:
                 outputs.append(prog.apply(example.input))
             except Exception:
                 outputs.append([[0]])
-        blob = json.dumps(outputs, sort_keys=True)
+        blob = json.dumps(make_hashable(outputs), sort_keys=True, separators=(",", ":"))
         return hashlib.md5(blob.encode()).hexdigest()
 
 

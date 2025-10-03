@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Sequence,
 from .color_maps import infer_color_maps_from_train
 from .grid_utils import dims, eq_grid
 from .objects import extract_objects, learn_object_transformation_maps
-from .program import Op, Program
+from .program import Op, Program, make_hashable, sanitize_params
 from .rule_engine import update_rule_confidence as update_rule_confidence_stats
 from .types import Example, Grid
 
@@ -120,6 +120,7 @@ class Candidate:
     outputs: List[Grid]
     struct_sig: str
     behavior_sig: str
+    output_sig: str
     last_op: Optional[str]
     neural_score: float
     combined_score: float
@@ -127,33 +128,31 @@ class Candidate:
 
 cache_transform_maps: Dict[str, Dict[Any, Dict[str, Any]]] = {}
 
-def _make_hashable(x: Any) -> Any:
-    """Recursively convert nested structures into JSON-safe, hashable forms."""
-    if isinstance(x, dict):
-        return tuple(sorted((str(k), _make_hashable(v)) for k, v in x.items()))
-    elif isinstance(x, (list, tuple)):
-        return tuple(_make_hashable(v) for v in x)
-    elif isinstance(x, (int, float, str, bool)) or x is None:
-        return x
-    else:
-        return str(x)
+
+def _serialise_for_hash(data: Any) -> str:
+    """Serialise ``data`` using the shared ``make_hashable`` helper."""
+
+    return json.dumps(make_hashable(data), sort_keys=True, separators=(",", ":"))
+
+
+def _md5_digest(blob: str, *, length: int | None = 12) -> str:
+    digest = hashlib.md5(blob.encode()).hexdigest()
+    return digest if length is None else digest[:length]
 
 def program_struct_signature(program: Program) -> str:
-    """Return a hash describing the program's structure (ops + params). Always JSON-safe + hashable."""
+    """Return a stable structural hash for ``program``."""
 
-    serial = [
-        (op.name, _make_hashable(op.params))
-        for op in program.ops
-    ]
-    blob = json.dumps(serial, sort_keys=True)
-    return hashlib.md5(blob.encode()).hexdigest()[:12]
+    try:
+        return program.short_signature()
+    except AttributeError:  # pragma: no cover - legacy safety
+        payload = [(op.name, make_hashable(op.params)) for op in program.ops]
+        return _md5_digest(_serialise_for_hash(payload))
 
 def _behaviour_blob(outputs: Sequence[Grid]) -> str:
     """Return a short hash of output behaviour. Always JSON-safe + hashable."""
     try:
         templates = [grid_to_template(grid) for grid in outputs]
-        serial = _make_hashable(templates)   # ✅ make it hashable
-        blob = json.dumps(serial, sort_keys=True)
+        blob = _serialise_for_hash(templates)
     except Exception as e:
         print(f"[WARN] _behaviour_blob crashed: {e}")
         blob = "[]"
@@ -174,11 +173,22 @@ def program_behavior_signature(program: Program, train: List[Example]) -> str:
             safe_out = [[0]]
         outputs.append(safe_out)
 
-    # ✅ use global _make_hashable
-    serial = _make_hashable(outputs)
-    blob = json.dumps(serial, sort_keys=True)
-    return hashlib.md5(blob.encode()).hexdigest()[:12]
+    blob = _serialise_for_hash(outputs)
+    return _md5_digest(blob)
 
+
+
+def _outputs_signature(outputs: Sequence[Grid]) -> str:
+    """Return a deterministic hash for raw program outputs."""
+
+    if not outputs:
+        return "empty"
+    try:
+        blob = _serialise_for_hash(outputs)
+    except Exception as exc:
+        print(f"[WARN] Failed to serialise outputs for hashing: {exc}")
+        return "error"
+    return _md5_digest(blob, length=None)
 
 
 def secondary_cell_accuracy(pred: Grid, true: Grid) -> float:
@@ -523,20 +533,7 @@ def generate_ascii_diff(pred: Grid, target: Grid) -> str:
 
 
 def _sanitize_params(params: Dict[Any, Any]) -> Dict[str, Any]:
-    """Ensure params are JSON-safe: str keys, primitive values only."""
-    safe = {}
-    for k, v in (params or {}).items():
-        key = str(k)
-        if isinstance(v, (tuple, list)):
-            safe[key] = [int(x) if isinstance(x, (int, bool)) else str(x) for x in v]
-        elif isinstance(v, dict):
-            safe[key] = {str(kk): int(vv) if isinstance(vv, (int, bool)) else str(vv)
-                         for kk, vv in v.items()}
-        elif isinstance(v, (int, float, bool)) or v is None:
-            safe[key] = v
-        else:
-            safe[key] = str(v)
-    return safe
+    return sanitize_params(params)
 
 # -----------------------------------------------------------------------------
 # Repair strategies, revisions, pooling
@@ -781,13 +778,16 @@ def bfs_synthesize(task: Any, cfg: SearchConfig) -> Tuple[List[Program], SearchS
     )
     neural_bias = max(0.0, min(1.0, cfg.neural_bias_weight))
     base_combined = (1.0 - neural_bias) * base_symbolic + neural_bias * base_neural
+    base_behavior_sig = _behaviour_blob(base_outputs)
+    base_output_sig = _outputs_signature(base_outputs)
     base_candidate = Candidate(
         base_program,
         base_primary,
         base_secondary,
         base_outputs,
         program_struct_signature(base_program),
-        _behaviour_blob(base_outputs),
+        base_behavior_sig,
+        base_output_sig,
         None,
         base_neural,
         base_combined,
@@ -836,6 +836,7 @@ def bfs_synthesize(task: Any, cfg: SearchConfig) -> Tuple[List[Program], SearchS
             nonlocal best_candidate
             struct_sig = program_struct_signature(program)
             behavior_sig = _behaviour_blob(outputs)
+            output_sig = _outputs_signature(outputs)
             last_op = program.ops[-1].name if program.ops else None
             neural_score = compute_neural_score(cfg, task, program, train, outputs)
             symbolic = (
@@ -852,6 +853,7 @@ def bfs_synthesize(task: Any, cfg: SearchConfig) -> Tuple[List[Program], SearchS
                 outputs,
                 struct_sig,
                 behavior_sig,
+                output_sig,
                 last_op,
                 neural_score,
                 combined,
@@ -909,20 +911,13 @@ def bfs_synthesize(task: Any, cfg: SearchConfig) -> Tuple[List[Program], SearchS
 
         # FIXED: use JSON-safe string signatures instead of tuple-of-tuples
         if cfg.deduplicate_equivalence and next_candidates:
-            seen_outputs: Dict[str, bool] = {}
+            seen_outputs: set[str] = set()
             unique_candidates: List[Candidate] = []
             for candidate in next_candidates:
-                try:
-                    signature = (
-                        json.dumps(_make_hashable(candidate.outputs), sort_keys=True)
-                        if candidate.outputs else "empty"
-                    )
-                except Exception as e:
-                    print(f"[WARN] Failed to hash candidate outputs: {e}")
-                    signature = "error"
+                signature = candidate.output_sig or "error"
                 if signature in seen_outputs:
                     continue
-                seen_outputs[signature] = True
+                seen_outputs.add(signature)
                 unique_candidates.append(candidate)
             next_candidates = unique_candidates
 
